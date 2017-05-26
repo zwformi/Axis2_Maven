@@ -1,10 +1,16 @@
 package com.zw.client;
 
+
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.rpc.client.RPCServiceClient;
+import org.springframework.stereotype.Component;
 
 import javax.xml.namespace.QName;
 import java.rmi.RemoteException;
@@ -12,14 +18,14 @@ import java.rmi.RemoteException;
 /**
  * Created by Administrator on 2017/5/26.
  */
+@Component("Test")
 public class Test {
 
     public static void main(String[] args) throws RemoteException {
         Test test = new Test();
-
       //  System.out.println("1   " + test.method1());
-        System.out.println("2    " + test.method2());
-      //  System.out.println("3    " + test.method3());
+        System.out.println("2:" + test.method2());
+        System.out.println("3:" + test.method3());
     }
 
     /**
@@ -63,7 +69,6 @@ public class Test {
      */
     public String method2() throws AxisFault {
         String url = "http://localhost:8080/services/ServiceServer?wsdl";
-
         // 使用RPC方式调用WebService
         RPCServiceClient serviceClient = new RPCServiceClient();
         // 指定调用WebService的URL
@@ -80,7 +85,7 @@ public class Test {
          * 命名空间 不一致导致的问题
          * org.apache.axis2.AxisFault: java.lang.RuntimeException: Unexpected subelement arg0
          */
-        QName qname = new QName("http://jh.com", "getStrA");
+        QName qname = new QName("http://axis2.zw.com", "getStrA");
         // 指定getPrice方法的参数值
         Object[] parameters = new Object[] { "zzzzzwwww" };
 
@@ -96,5 +101,47 @@ public class Test {
         return result;
     }
 
+    /**
+     * 方法三： 应用document方式调用
+     * 用ducument方式应用现对繁琐而灵活。现在用的比较多。因为真正摆脱了我们不想要的耦合
+     */
+    public String method3() {
+
+        OMElement result = null;
+        try {
+            // String url = "http://localhost:8080/axis2ServerDemo/services/StockQuoteService";
+            String url = "http://localhost:8080/services/ServiceServer?wsdl";
+
+            Options options = new Options();
+            // 指定调用WebService的URL
+            EndpointReference targetEPR = new EndpointReference(url);
+            options.setTo(targetEPR);
+            // options.setAction("urn:getPrice");
+
+            ServiceClient sender = new ServiceClient();
+            sender.setOptions(options);
+
+            OMFactory fac = OMAbstractFactory.getOMFactory();
+            String tns = "http://axis2.zw.com";
+            // 命名空间，有时命名空间不增加没事，不过最好加上，因为有时有事，你懂的
+            OMNamespace omNs = fac.createOMNamespace(tns, "");
+
+            OMElement method = fac.createOMElement("getStrA", omNs);
+            OMElement symbol = fac.createOMElement("str", omNs);
+            // symbol.setText("1");
+            symbol.addChild(fac.createOMText(symbol, "米蕾你好！！"));
+            method.addChild(symbol);
+            method.build();
+
+            result = sender.sendReceive(method);
+
+            System.out.println("*************** " + result);
+            //<ns:getNameResponse xmlns:ns="http://jh.com"><ns:return>欢迎您。 Axis2 Echo String </ns:return></ns:getNameResponse>
+
+        } catch (AxisFault axisFault) {
+            axisFault.printStackTrace();
+        }
+        return result + "";
+    }
 
 }
