@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="axis2_client:war">
+    <output-path>$PROJECT_DIR$/axis2_client/target</output-path>
+    <root id="archive" name="axis2_client.war">
+      <element id="artifact" artifact-name="axis2_client:war exploded" />
+    </root>
+  </artifact>
+</component>

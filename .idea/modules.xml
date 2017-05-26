@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/axis2_client/axis2_client.iml" filepath="$PROJECT_DIR$/axis2_client/axis2_client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/axis2_service/mavenssh.iml" filepath="$PROJECT_DIR$/axis2_service/mavenssh.iml" />
+    </modules>
+  </component>
+</project>
